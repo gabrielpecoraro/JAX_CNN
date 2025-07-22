@@ -58,7 +58,7 @@ class MLP:
 
     def custom_transform(self, x):
         # Convert Torch tensor to np array
-        return np.ravel(np.array(x, dtype=np.float32)) / 255.0
+        return np.ravel(np.array(x, dtype=jnp.float32)) / 255.0
 
     def custom_collate_fn(self, batch):
         transposed_data = list(zip(*batch))

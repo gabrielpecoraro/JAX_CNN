@@ -1,2 +1,5 @@
-test_mnist/ 
-train_mnist/
+
+train*/ 
+test*/
+data/
+
