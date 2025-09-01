@@ -6,7 +6,7 @@ import jax.numpy as jnp
 from jax import grad, vmap, pmap, value_and_grad, jit
 from jax import random
 import time
-
+import pickle
 from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
 
@@ -24,7 +24,7 @@ class MLP:
         # Hyperparameters
         self.batch_size = 128
         self.lr = 0.001
-        self.epochs = 20
+        self.epochs = 30
 
     def init_weights(self):
         keys = jax.random.split(self.key, num=len(self.layer_width) - 1)
@@ -69,10 +69,16 @@ class MLP:
 
     def load(self):
         self.train_dataset = MNIST(
-            "train_mnist", train=True, download=True, transform=self.custom_transform
+            "data/train_mnist",
+            train=True,
+            download=True,
+            transform=self.custom_transform,
         )
         self.test_dataset = MNIST(
-            "test_mnist", train=False, download=True, transform=self.custom_transform
+            "data/test_mnist",
+            train=False,
+            download=True,
+            transform=self.custom_transform,
         )
 
         self.train_loader = DataLoader(
@@ -161,35 +167,7 @@ class MLP:
 
                 if cnt % 50 == 0:
                     print(loss)
-            print(
-                f"Epoch = {epoch}, train_acc = {self.accuracy(self.train_images, self.train_labels)},"
-                f"test_acc = {self.accuracy(self.test_images, self.test_labels)}"
-            )
 
     def flow(self):
         self.init_weights()
         self.training()
-
-
-if __name__ == "__main__":
-    mlp = MLP()
-    mlp_jit = MLP()
-    mlp_pmap = MLP()
-
-    print("NONE")
-    print("----------")
-    start = time.perf_counter()
-    mlp.flow()
-    end = time.perf_counter()
-    elapsed = end - start
-
-    print("JIT")
-    print("----------")
-    start_jit = time.perf_counter()
-    jit(mlp_jit.flow)()
-    end_jit = time.perf_counter()
-    elapsed_jit = end_jit - start_jit
-    print("----------")
-
-    print(f"Time taken without jit: {elapsed:.6f} seconds")
-    print(f"Time taken with jit: {elapsed_jit:.6f} seconds")
